@@ -1,7 +1,8 @@
 public enum AccountType {
 
-    CASH,
     BANK_ACCOUNT,
     CARD,
+    CASH,
     STOCK
+
 }
