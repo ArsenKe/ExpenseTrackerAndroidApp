@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ProfileFragment"
+    android:background="@android:color/background_light">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:background="#fbfcfc">
+
+            <ImageView
+                android:id="@+id/imageView_profile_dp"
+                android:layout_width="202dp"
+                android:layout_height="166dp"
+                android:background="@drawable/account"
+                android:layout_centerInParent="true"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_show_welcome"
+                android:layout_below="@id/imageView_profile_dp"
+                android:hint="User Profile"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                android:textColor="@color/white"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="30dp"
+            android:background="@color/white"
+            android:padding="15dp">
+
+            <ImageView
+                android:id="@+id/ic_profile"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:background="@drawable/user_profile" />
+
+            <TextView
+                android:id="@+id/textView_show_full_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@id/ic_profile"
+                android:layout_marginStart="50dp"
+                android:hint="Adhurim Kuci"
+                android:textSize="18sp" />
+
+            <View
+                android:id="@+id/divider_name"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@id/textView_show_full_name"
+                android:layout_marginTop="12dp"
+                android:background="@android:color/darker_gray" />
+
+            <ImageView
+                android:id="@+id/ic_email"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_below="@id/divider_name"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/email" />
+
+            <TextView
+                android:id="@+id/textView_show_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/divider_name"
+                android:layout_alignStart="@id/ic_email"
+                android:layout_marginStart="50dp"
+                android:layout_marginTop="20dp"
+                android:hint="adhurimkuqi@hotmail.com"
+                android:textSize="18sp" />
+
+            <!--- show db -->
+            <View
+                android:id="@+id/divider_email"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@id/textView_show_email"
+                android:layout_marginTop="17dp"
+                android:background="@android:color/darker_gray" />
+
+            <ImageView
+                android:id="@+id/ic_db"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_below="@id/divider_email"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/birthday" />
+
+            <TextView
+                android:id="@+id/textView_show_db"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/divider_email"
+                android:layout_alignStart="@id/ic_db"
+                android:layout_marginStart="50dp"
+                android:layout_marginTop="20dp"
+                android:hint="26.06.1997"
+                android:textSize="18sp" />
+
+            <!--- Telephone -->
+            <View
+                android:id="@+id/divider_db"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@id/textView_show_db"
+                android:layout_marginTop="14dp"
+                android:background="@android:color/darker_gray" />
+
+            <ImageView
+                android:id="@+id/ic_tel"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_below="@id/divider_db"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/telephone" />
+
+            <TextView
+                android:id="@+id/textView_show_tel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/divider_db"
+                android:layout_alignStart="@id/ic_tel"
+                android:layout_marginStart="50dp"
+                android:layout_marginTop="20dp"
+                android:hint="+43 676 4293068"
+                android:textSize="18sp" />
+
+            <View
+                android:id="@+id/divider_tel"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@id/textView_show_tel"
+                android:layout_marginTop="20dp"
+                android:background="@android:color/darker_gray" />
+
+
+        </RelativeLayout>
+        <com.google.android.material.button.MaterialButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/updatebtn"
+            android:layout_below="@id/password"
+            android:layout_gravity="center"
+            android:text="Update"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/black"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="10dp"
+            android:textSize="25dp"/>
+    </LinearLayout>
+
+</RelativeLayout>
