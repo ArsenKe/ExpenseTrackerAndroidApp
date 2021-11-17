@@ -5,19 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    >
-
+    tools:context=".accountActivity">
 
     <TextView
         android:id="@+id/totalBudgetTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Total Budget amount: $0"
         android:textSize="25sp"
         android:textStyle="bold"
         android:textAlignment="center"
         android:textColor="#000"
-        android:layout_marginTop="5dp"/>
+        android:layout_marginTop="5dp"
+        />
 
     <EditText
         android:layout_width="match_parent"
@@ -45,6 +44,19 @@
         android:id="@+id/get_transaction"
         />
 
+    <TextView
+        android:id="@+id/amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+    <Button
+        android:id="@+id/addAccountButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ADD ACCOUNT"
+        android:onClick="accountInput"
+        />
 
 
 </LinearLayout>

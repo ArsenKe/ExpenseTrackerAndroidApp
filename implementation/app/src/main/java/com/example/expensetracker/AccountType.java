@@ -1,3 +1,4 @@
+
 public enum AccountType {
 
     BANK_ACCOUNT,
