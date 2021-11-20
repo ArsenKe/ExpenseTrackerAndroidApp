@@ -1,5 +1,6 @@
 package com.example.expensetracker;
 
+import android.accounts.Account;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
@@ -40,7 +41,7 @@ public class HomeFragment extends Fragment {
         firstCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), accountActivity.class);
+                Intent intent = new Intent(getActivity(), Account.class);
                 startActivity(intent);
             }
         });

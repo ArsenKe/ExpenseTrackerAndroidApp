@@ -3,8 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Computer/AndroidStudioProjects/SE2 16.11/implementation/app/src/main/res/drawable/account.xml" value="0.1875" />
         <entry key="..\:/Users/Computer/AndroidStudioProjects/SE2 16.11/implementation/app/src/main/res/drawable/edittext.xml" value="0.11388888888888889" />
         <entry key="..\:/Users/Computer/AndroidStudioProjects/SE2 16.11/implementation/app/src/main/res/layout/activity_account.xml" value="0.2074074074074074" />
+        <entry key="..\:/Users/Computer/AndroidStudioProjects/SE2 16.11/implementation/app/src/main/res/layout/activity_home_fragment.xml" value="0.29814814814814816" />
+        <entry key="..\:/Users/Computer/AndroidStudioProjects/SE2 16.11/implementation/app/src/main/res/layout/activity_transaction.xml" value="0.3074074074074074" />
       </map>
     </option>
   </component>

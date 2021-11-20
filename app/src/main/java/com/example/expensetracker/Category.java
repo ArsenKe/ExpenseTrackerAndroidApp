@@ -1,5 +1,7 @@
 
 
+import com.example.expensetracker.TransactionType;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,11 +11,11 @@ public class Category {
     private String name;
     private boolean deleted;
     private User User;
-    private final Set<TransactionType> validTransactionTypes;
+    //private final Set<TransactionType> validTransactionTypes;
     private final Set<AccountType> validAccountTypes;
 
     public Category(String name){
-        validTransactionTypes = new HashSet<>();
+        //validTransactionTypes = new HashSet<>();
         validAccountTypes = new HashSet<>();
         this.name = name;
     }
@@ -34,8 +36,8 @@ public class Category {
         return User;
     }
 
-    public Set<TransactionType> getValidTransactionTypes() {
-        return validTransactionTypes;
+    public void getValidTransactionTypes() {
+     //   return validTransactionTypes;
     }
 
     public Set<AccountType> getValidAccountTypes() {
@@ -57,7 +59,7 @@ public class Category {
     }
 
     public void addValidTransactionType(TransactionType transactionType) {
-        validTransactionTypes.add(transactionType);
+        //validTransactionTypes.add(transactionType);
     }
 
     public void addValidAccountType(AccountType accountType) {
@@ -65,10 +67,10 @@ public class Category {
     }
 
     public void removeValidTransactionType(TransactionType transactionType) {
-        validTransactionTypes.remove(transactionType);
+       // validTransactionTypes.remove(transactionType);
     }
 
     public void removeValidAccountType(AccountType accountType) {
-        validAccountTypes.remove(accountType);
+       // validAccountTypes.remove(accountType);
     }
 }
