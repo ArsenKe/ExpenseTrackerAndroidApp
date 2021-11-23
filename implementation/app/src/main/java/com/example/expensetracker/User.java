@@ -1,3 +1,5 @@
+package com.example.expensetracker;
+
 public class User {
 
     private int id;

@@ -8,6 +8,16 @@
     tools:context=".accountActivity">
 
     <TextView
+        android:id="@+id/accountNameView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textAlignment="center"
+        android:textColor="#000"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
+    <TextView
         android:id="@+id/totalBudgetTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,32 +26,6 @@
         android:textAlignment="center"
         android:textColor="#000"
         android:layout_marginTop="5dp"
-        />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@drawable/edittext"
-        android:layout_marginTop="50dp"
-        android:hint="Enter you name"
-        android:layout_marginHorizontal="20dp"
-        android:id="@+id/account_holder_name"
-        />
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@drawable/edittext"
-        android:layout_marginTop="50dp"
-        android:hint="Enter you account type"
-        android:layout_marginHorizontal="20dp"
-        android:id="@+id/account_type"
-        />
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="50dp"
-        android:text="Get Transaction"
-        android:id="@+id/get_transaction"
         />
 
     <TextView
@@ -54,9 +38,45 @@
         android:id="@+id/addAccountButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="ADD ACCOUNT"
-        android:onClick="accountInput"
+        android:text="ADD TRANSACTION"
+        android:onClick="addTransaction"
         />
+
+    <Button
+        android:id="@+id/changeAccountButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="CHANGE TRANSACTION"
+        android:onClick="updateTransaction"
+        />
+
+    <Button
+        android:id="@+id/deleteAccountButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="DELETE TRANSACTION"
+        android:onClick="deleteTransaction"
+        />
+
+    <Button
+        android:id="@+id/homeButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="backHome"
+        android:text="HOME" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewTransactions"
+        android:layout_width="match_parent"
+        android:layout_height="258dp"
+        android:layout_marginBottom="276dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/changeAccountButton"
+        app:layout_constraintVertical_bias="0.085">
+
+    </androidx.recyclerview.widget.RecyclerView>
 
 
 </LinearLayout>

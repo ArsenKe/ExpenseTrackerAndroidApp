@@ -13,7 +13,6 @@ import com.google.android.material.button.MaterialButton;
 public class MainActivity extends AppCompatActivity {
 
     public DBHelper mydb;
-    public AbstractRepository ar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +20,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mydb = new DBHelper(this);
-        ar = new AccountRepository(mydb);
 
         TextView username = (TextView) findViewById(R.id.username);
         TextView password = (TextView) findViewById(R.id.password);
@@ -47,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public void openUserActivity () {
-        Intent intent = new Intent(this, UserActivity.class);
+        Intent intent = new Intent(this, HomeFragment.class);
         startActivity(intent);
     }
 

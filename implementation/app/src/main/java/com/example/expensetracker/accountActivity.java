@@ -1,152 +1,116 @@
 package com.example.expensetracker;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import android.accounts.Account;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.InputType;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 
-// refrences
-//https://stackoverflow.com/questions/15762905/how-can-i-display-a-list-view-in-an-android-alert-dialog
-public class accountActivity extends AppCompatActivity {
-private EditText name;
-private EditText account;
-private Button create_account;
-private  String id_of_account;
-private String name_person;
-private String account_type;
+public class accountActivity extends AppCompatActivity implements IDataBase {
+
+private String accountName;
 private TextView accountOutput;
 private TextView balanceOutput;
-private AccountRepository accountRep;
 private DBHelper mydb;
+private ArrayList<Account> accountData;
+private ArrayList<Transaction> transactionData;
+private Integer deleteID;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account);
-        name=findViewById(R.id.account_holder_name);
-        account=findViewById(R.id.account_type);
-        create_account=findViewById(R.id.get_transaction);
-        create_account.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void onClick(View v) {
-                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-                LocalDateTime now = LocalDateTime.now();
-                if(!name.getText().toString().isEmpty()&&!account.getText().toString().isEmpty())
-                id_of_account=now.toString()+name.getText().toString()+account.getText().toString();
 
-                else{
-                    if(name.getText().toString().isEmpty())
-                    {
-                        name.setError("Enter the name please");
-                    }
-                    else{
-                        account.setError("Kindly select the acccount");
-                    }
-                }
-            }
-        });
-
-    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    // add a list
-    String[] account_type = {"BANK_ACCOUNT",
-            "CARD",
-            "CASH", 
-            "STOCK"};
-    builder.setItems(account_type, new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            account.setText(account_type[which]);
-        }
-    });
-   account.setOnClickListener(new View.OnClickListener() {
-       @Override
-       public void onClick(View v) {
-           AlertDialog dialog = builder.create();
-           dialog.show();
-       }
-   });
-
-
-    // create and show the alert dialog
-
-
+        Intent intent = getIntent();
+        accountName = intent.getStringExtra("accountName");
 
         mydb = new DBHelper(accountActivity.this);
-        //accountRep = new AccountRepository(mydb);
+        readDB();
 
-        accountOutput = (TextView) findViewById(R.id.amount);
+        accountOutput = (TextView) findViewById(R.id.accountNameView);
         balanceOutput = (TextView) findViewById(R.id.totalBudgetTextView);
-        readData();
-    }
+        getAccountData();
 
-    public void saveData(String accountType, double value) {
-        //Bundle extras = getIntent().getExtras();
-        //if (extras != null) {
-            //int Value = extras.getInt("accountID");
-            //if(Value > 0) {
-                //upgrade data
-            //}
-                //accountRep.writeInDB(accountType, value);
-                mydb.addAccount(accountType, value);
-                readData();
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewTransactions);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(linearLayoutManager);
 
-                Intent intent = new Intent(getApplicationContext(), accountActivity.class);
-                startActivity(intent);
-        //}else {
-            //System.out.println("not added");
-        //}
-    }
-
-
-    public void readData() {
-            //should be the number of account saved in account object when creating
-            Cursor data = mydb.getData(2);
-            double balance = 0;
-
-            if (data.moveToFirst()) {
-                do {
-                    balance = data.getDouble(data.getColumnIndex("accountBalance"));
-                } while (data.moveToNext());
-            }
-
-            balanceOutput.setText("Account balance: " + balance);
-            balanceOutput.setFocusable(false);
-            balanceOutput.setClickable(false);
+        CustomAdapterTransaction customAdapter = new CustomAdapterTransaction(transactionData);
+        recyclerView.setAdapter(customAdapter);
 
     }
 
-    public void accountInput(View view) {
+    public void saveData(String accountName, String transType, String category, Double value) {
+        mydb.addTransaction(accountName, transType, category, value);
+        getAccountData();
+    }
+
+    public void updateData(String accountType, String newAccountType, double value) {
+        mydb.updateAccount(accountType, newAccountType, value);
+        getAccountData();
+    }
+
+    public void deleteData(Integer transID) {
+        mydb.deleteTransaction(transID);
+        getAccountData();
+    }
+
+    public void addTransaction(View view) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle("Account Name");
-        alertDialogBuilder.setMessage("Enter value:");
+        alertDialogBuilder.setTitle("Add Transaction");
+        alertDialogBuilder.setMessage("Enter transaction:");
         alertDialogBuilder.setCancelable(false);
 
-        EditText input = new EditText(this);
-        alertDialogBuilder.setView(input);
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
 
-        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        List<String> s = new ArrayList<String>();
+        for(String str : mydb.getAllCategories()) {
+            s.add(str);
+        }
+        final ArrayAdapter<String> adp = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, s);
+
+        List<String> t = new ArrayList<String>();
+        t.add("Income");
+        t.add("Expense");
+        final ArrayAdapter<String> adp2 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, t);
+
+        final Spinner transTypes = new Spinner(this);
+        transTypes.setAdapter(adp2);
+        layout.addView(transTypes);
+
+        final Spinner categories = new Spinner(this);
+        categories.setAdapter(adp);
+        layout.addView(categories);
+
+        final EditText inputValue = new EditText(this);
+        inputValue.setHint("Value");
+        layout.addView(inputValue);
+
+        alertDialogBuilder.setView(layout);
+
+        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
-                String inputValue = input.getText().toString();
-                saveData("BANK_ACCOUNT", Double.parseDouble(inputValue));
+                String transType = transTypes.getSelectedItem().toString();
+                String category = categories.getSelectedItem().toString();
+                String value = inputValue.getText().toString();
+                saveData(accountName, transType, category, Double.parseDouble(value));
                 Intent intent = new Intent(getApplicationContext(), accountActivity.class);
                 startActivity(intent);
             }
@@ -163,15 +127,142 @@ private DBHelper mydb;
         alertDialog.show();
     }
 
-    public String getName_person() {
-        return name_person;
+    public void deleteTransaction(View view) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        if(deleteID != null) {
+            alertDialogBuilder.setTitle("Delete Transaction");
+            alertDialogBuilder.setMessage("Are you sure?");
+            alertDialogBuilder.setCancelable(false);
+
+            alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface arg0, int arg1) {
+                    deleteData(deleteID);
+                    Intent intent = new Intent(getApplicationContext(), accountActivity.class);
+                    startActivity(intent);
+                }
+            });
+
+            alertDialogBuilder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(getApplicationContext(),"You clicked on Cancel",Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            alertDialogBuilder.setTitle("No Transaction Selected");
+            alertDialogBuilder.setMessage("Select Transaction");
+            alertDialogBuilder.setCancelable(false);
+
+            alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface arg0, int arg1) {
+                }
+            });
+        }
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
-    public String getAccount_type() {
-        return account_type;
+    public void updateTransaction(View view) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Account Name");
+        alertDialogBuilder.setMessage("Enter value:");
+        alertDialogBuilder.setCancelable(false);
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+        List<String> s = new ArrayList<String>();
+
+        ArrayList<Account> accountData = getAccountData();
+        for(Account a : accountData) {
+            s.add(a.getAccountType());
+        }
+
+        final ArrayAdapter<String> adp = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, s);
+
+        final Spinner input = new Spinner(this);
+        input.setAdapter(adp);
+        layout.addView(input);
+
+        final EditText nameChanged = new EditText(this);
+        nameChanged.setHint("Change Account Name");
+        layout.addView(nameChanged);
+
+        final EditText valueInput = new EditText(this);
+        valueInput.setHint("Change Value");
+        layout.addView(valueInput);
+
+        alertDialogBuilder.setView(layout);
+
+        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+                   String accountType = input.getSelectedItem().toString();
+                   String newAccountType = nameChanged.getText().toString();
+                   String inputValue = valueInput.getText().toString();
+
+                   updateData(accountType, newAccountType, Double.parseDouble(inputValue));
+                Intent intent = new Intent(getApplicationContext(), HomeFragment.class);
+                startActivity(intent);
+            }
+        });
+
+        alertDialogBuilder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(),"You clicked on Cancel",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
-    public String getId_of_account() {
-        return id_of_account;
+    @Override
+    public void readDB() {
+        accountData = mydb.getAllAccounts();
+        transactionData = mydb.getAllTransactions();
     }
+
+    public ArrayList<Account> getAccountData() {
+        ArrayList<Account> accountData = mydb.getAllAccounts();
+        double balance = 0;
+        Account account = new Account("test", 0.0);
+
+        for(Account a : accountData) {
+            balance += a.getValue();
+            if(a.getAccountType().equals(accountName)) account = a;
+        }
+
+        Double accountValue = account.getValue();
+
+        balanceOutput.setText("Account balance: " + accountValue);
+        balanceOutput.setFocusable(false);
+        balanceOutput.setClickable(false);
+
+        accountOutput.setText(accountName);
+        accountOutput.setFocusable(false);
+        accountOutput.setClickable(false);
+
+        return accountData;
+    }
+
+    public void backHome(View view) {
+        Intent intent = new Intent(accountActivity.this, HomeFragment.class);
+        startActivity(intent);
+    }
+
+    public void getItemForDelete(View view) {
+        TextView transID;
+
+        transID = (TextView) view.findViewById(R.id.transID);
+
+        deleteID = Integer.parseInt(transID.getText().toString());
+
+    }
+
 }

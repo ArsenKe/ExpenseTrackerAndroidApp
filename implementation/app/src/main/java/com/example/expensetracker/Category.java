@@ -1,74 +1,195 @@
+package com.example.expensetracker;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.Toast;
 
-import java.util.HashSet;
-import java.util.Set;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-public class Category {
+import java.util.ArrayList;
+import java.util.List;
 
-    private int id;
-    private String name;
-    private boolean deleted;
-    private User User;
-    private final Set<TransactionType> validTransactionTypes;
-    private final Set<AccountType> validAccountTypes;
+public class Category extends AppCompatActivity implements IDataBase {
 
-    public Category(String name){
-        validTransactionTypes = new HashSet<>();
-        validAccountTypes = new HashSet<>();
-        this.name = name;
+    DBHelper mydb;
+    ArrayList<String> categories = new ArrayList<String>();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_categories);
+
+        mydb = new DBHelper(Category.this);
+
+        readDB();
+
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewCategories);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(linearLayoutManager);
+
+        CustomAdapter customAdapter = new CustomAdapter(categories);
+        recyclerView.setAdapter(customAdapter);
     }
 
-    public int getId() {
-        return id;
+    public void backHome(View view) {
+        Intent intent = new Intent(Category.this, HomeFragment.class);
+        startActivity(intent);
     }
 
-    public String getName() {
-        return name;
+    @Override
+    public void readDB() {
+        categories = mydb.getAllCategories();
     }
 
-    public boolean isDeleted() {
-        return deleted;
+    public void saveData(String categoryName) {
+        mydb.addCategory(categoryName);
+        readDB();
     }
 
-    public User getUser() {
-        return User;
+    public void updateData(String categoryName, String newCategoryName) {
+        mydb.updateCategory(categoryName, newCategoryName);
+        readDB();
     }
 
-    public Set<TransactionType> getValidTransactionTypes() {
-        return validTransactionTypes;
+    public void deleteData(String categoryName) {
+        mydb.deleteCategory(categoryName);
+        readDB();
     }
 
-    public Set<AccountType> getValidAccountTypes() {
-        return validAccountTypes;
+    public void addCategory(View view) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Add Category");
+        alertDialogBuilder.setMessage("Enter Category Name:");
+        alertDialogBuilder.setCancelable(false);
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+        final EditText inputName = new EditText(this);
+        inputName.setHint("Category Name");
+        layout.addView(inputName);
+
+        alertDialogBuilder.setView(layout);
+
+        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+                String name = inputName.getText().toString();
+                saveData(name);
+                Intent intent = new Intent(getApplicationContext(), Category.class);
+                startActivity(intent);
+            }
+        });
+
+        alertDialogBuilder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(),"You clicked on Cancel",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
+    public void updateCategories(View view) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Category Name");
+        alertDialogBuilder.setMessage("Enter Changed Name:");
+        alertDialogBuilder.setCancelable(false);
 
-    public void setName(String name) {
-        if (name == null){
-            throw new IllegalArgumentException("Could not set name of category, because it was null.");
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+        List<String> s = new ArrayList<String>();
+        for(String str : categories) {
+            s.add(str);
         }
-        if (name.length() == 0) {
-            throw new IllegalArgumentException("Could not set name of category, because length of name was 0.");
+
+        final ArrayAdapter<String> adp = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, s);
+
+        final Spinner input = new Spinner(this);
+        input.setAdapter(adp);
+        layout.addView(input);
+
+        final EditText nameChanged = new EditText(this);
+        nameChanged.setHint("Change Category Name");
+        layout.addView(nameChanged);
+
+        alertDialogBuilder.setView(layout);
+
+        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+                String categoryToChange = input.getSelectedItem().toString();
+                String newCategory = nameChanged.getText().toString();
+                updateData(categoryToChange, newCategory);
+                Intent intent = new Intent(getApplicationContext(), Category.class);
+                startActivity(intent);
+            }
+        });
+
+        alertDialogBuilder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(),"You clicked on Cancel",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+    public void deleteCategory(View view) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Category Name");
+        alertDialogBuilder.setMessage("Enter Category:");
+        alertDialogBuilder.setCancelable(false);
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+        List<String> s = new ArrayList<String>();
+        for(String str : categories) {
+            s.add(str);
         }
-        this.name = name;
+
+        final ArrayAdapter<String> adp = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, s);
+
+        final Spinner input = new Spinner(this);
+        input.setAdapter(adp);
+        layout.addView(input);
+
+        alertDialogBuilder.setView(layout);
+
+        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+                String inputValue = input.getSelectedItem().toString();
+                deleteData(inputValue);
+                Intent intent = new Intent(getApplicationContext(), Category.class);
+                startActivity(intent);
+            }
+        });
+
+        alertDialogBuilder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(),"You clicked on Cancel",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
-    public void addValidTransactionType(TransactionType transactionType) {
-        validTransactionTypes.add(transactionType);
-    }
-
-    public void addValidAccountType(AccountType accountType) {
-        validAccountTypes.add(accountType);
-    }
-
-    public void removeValidTransactionType(TransactionType transactionType) {
-        validTransactionTypes.remove(transactionType);
-    }
-
-    public void removeValidAccountType(AccountType accountType) {
-        validAccountTypes.remove(accountType);
-    }
 }
