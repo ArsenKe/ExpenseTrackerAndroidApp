@@ -12,6 +12,7 @@
         android:id="@+id/linerLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="getItemForDelete"
         android:orientation="horizontal">
 
         <TextView
@@ -19,7 +20,6 @@
             android:layout_width="94dp"
             android:layout_height="wrap_content"
             android:text="item"
-            android:onClick="getItemForDelete"
             android:textColor="#000"
             android:textSize="18sp"
             android:textStyle="bold" />

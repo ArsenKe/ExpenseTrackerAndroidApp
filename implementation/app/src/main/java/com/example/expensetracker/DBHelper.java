@@ -56,19 +56,9 @@ public class DBHelper extends SQLiteOpenHelper {
         contantValues.put("transValue", transValue);
         db.insert("transactions", null, contantValues);
         db.close();
-        ArrayList<Account> accounts = getAllAccounts();
-        double value = 0;
-        for(Account a : accounts) {
-            if(a.getAccountType().equals(accountType)) {
-                value = a.getValue();
-            }
-        }
-        if(transType.equals("INCOME")) {
-            value += transValue;
-        } else {
-            value -= transValue;
-        }
-        updateAccount(accountType, "", value);
+
+        updateAccountsAfterModification(accountType, transType, transValue);
+
         return true;
     }
 
@@ -93,6 +83,8 @@ public class DBHelper extends SQLiteOpenHelper {
         contantValues.put("accountBalance", value);
         db.update("accounts", contantValues, "accountType = ?", new String[]{accountType});
         db.close();
+
+        if(!newAccountType.equals("")) { updateTransactionsAfterModification(accountType, newAccountType); }
         return true;
     }
 
@@ -106,14 +98,43 @@ public class DBHelper extends SQLiteOpenHelper {
         return true;
     }
 
+    public boolean updateTransaction(Integer transID, String accountType, String transType, String category, String newTransValue, Double transValue)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contantValues = new ContentValues();
+
+        if(!transType.equals("")) { contantValues.put("transType", transType); }
+        if(!category.equals("")) { contantValues.put("category", category); }
+        if(!transValue.equals("")) { contantValues.put("transValue", newTransValue); }
+
+        db.update("transactions", contantValues, "transactionID = ?", new String[]{transID.toString()});
+        db.close();
+
+        String oldTransType = "";
+        for(Transaction t : getAllTransactions()) {
+            if(t.getTransID() == transID) {
+                oldTransType = t.getTransType();
+            }
+        }
+
+        if(deleteTransaction(transID, accountType, oldTransType, transValue) == 1) {
+            addTransaction(accountType, transType, category, Double.parseDouble(newTransValue));
+        }
+
+        return true;
+    }
+
     public void deleteAccount(String accountType){
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("accounts","accountType = ?", new String[]{accountType});
+        db.delete("transactions","accountType = ?", new String[]{accountType});
     }
 
-    public Integer deleteTransaction(Integer transID){
+    public Integer deleteTransaction(Integer transID, String accountType, String transType, Double transValue){
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete("transactions","transactionID = ?", new String[]{Integer.toString(transID)});
+        db.delete("transactions","transactionID = ?", new String[]{Integer.toString(transID)});
+        updateAccountsAfterModification(accountType, transType, transValue*(-1));
+        return 1;
     }
 
     public Integer deleteCategory(String category){
@@ -123,7 +144,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public Account getAccountData(String accountName){
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("Select * from accounts where accountType = " + accountName + "", null);
+        Cursor res = db.rawQuery("Select * from accounts where accountType = ?", new String[] {accountName});
         Account ret = new Account(res.getString(res.getColumnIndex("accountType")), res.getDouble(res.getColumnIndex("accountBalance")));
         return ret;
     }
@@ -179,5 +200,57 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
         return arrayList;
+    }
+
+    public ArrayList<Transaction> getTransactions(String accountName){
+        ArrayList<Transaction> arrayList= new ArrayList<Transaction>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        try {
+            Cursor cursor = db.rawQuery("Select * from transactions where accountType = ?", new String[] {accountName});
+
+            if (cursor.moveToFirst()) {
+                do {
+                    Integer transID = cursor.getInt(cursor.getColumnIndex("transactionID"));
+                    String accountType = cursor.getString(cursor.getColumnIndex("accountType"));
+                    String transType = cursor.getString(cursor.getColumnIndex("transType"));
+                    String category = cursor.getString(cursor.getColumnIndex("category"));
+                    Double value = cursor.getDouble(cursor.getColumnIndex("transValue"));
+                    Transaction transaction = new Transaction(accountType, transType, category, value);
+                    transaction.setTransID(transID);
+                    arrayList.add(transaction);
+                } while (cursor.moveToNext());
+            }
+        }catch(RuntimeException r) {
+            r.printStackTrace();
+        }
+
+        return arrayList;
+    }
+
+    public void updateAccountsAfterModification(String accountType, String transType, Double transValue) {
+        ArrayList<Account> accounts = getAllAccounts();
+        double value = 0;
+        for(Account a : accounts) {
+            if(a.getAccountType().equals(accountType)) {
+                value = a.getValue();
+            }
+        }
+        if(transType.equals("Income")) {
+            value += transValue;
+        } else {
+            value -= transValue;
+        }
+        updateAccount(accountType, "", value);
+    }
+
+    public void updateTransactionsAfterModification(String accountType, String newAccountType) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contantValues = new ContentValues();
+
+        contantValues.put("accountType", newAccountType);
+
+        db.update("transactions", contantValues, "accountType = ?", new String[]{accountType});
+        db.close();
     }
 }

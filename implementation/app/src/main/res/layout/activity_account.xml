@@ -39,7 +39,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="ADD TRANSACTION"
-        android:onClick="addTransaction"
+        android:onClick="addToDB"
         />
 
     <Button
@@ -47,7 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="CHANGE TRANSACTION"
-        android:onClick="updateTransaction"
+        android:onClick="updateInDB"
         />
 
     <Button
@@ -55,7 +55,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="DELETE TRANSACTION"
-        android:onClick="deleteTransaction"
+        android:onClick="deleteFromDB"
         />
 
     <Button

@@ -65,7 +65,8 @@ public class Category extends AppCompatActivity implements IDataBase {
         readDB();
     }
 
-    public void addCategory(View view) {
+    @Override
+    public void addToDB(View view) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Add Category");
         alertDialogBuilder.setMessage("Enter Category Name:");
@@ -101,7 +102,8 @@ public class Category extends AppCompatActivity implements IDataBase {
         alertDialog.show();
     }
 
-    public void updateCategories(View view) {
+    @Override
+    public void updateInDB(View view) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Category Name");
         alertDialogBuilder.setMessage("Enter Changed Name:");
@@ -149,7 +151,8 @@ public class Category extends AppCompatActivity implements IDataBase {
         alertDialog.show();
     }
 
-    public void deleteCategory(View view) {
+    @Override
+    public void deleteFromDB(View view) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Category Name");
         alertDialogBuilder.setMessage("Enter Category:");

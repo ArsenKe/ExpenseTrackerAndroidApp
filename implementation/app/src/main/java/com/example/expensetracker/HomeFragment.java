@@ -18,6 +18,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +65,8 @@ public class HomeFragment extends AppCompatActivity implements IDataBase {
         getAccountData();
     }
 
-    public void addAccount(View view) {
+    @Override
+    public void addToDB(View view) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Add Account");
         alertDialogBuilder.setMessage("Enter Account Name & Value:");
@@ -90,6 +92,18 @@ public class HomeFragment extends AppCompatActivity implements IDataBase {
         inputValue.setHint("Value");
         layout.addView(inputValue);
 
+        if(inputValue.getText().toString().isEmpty()) {
+            alertDialogBuilder.setTitle("No Value Entered!");
+            alertDialogBuilder.setMessage("Please Enter Value");
+            alertDialogBuilder.setCancelable(false);
+
+            alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface arg0, int arg1) {
+                }
+            });
+        }
+
         alertDialogBuilder.setView(layout);
 
         alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -97,9 +111,13 @@ public class HomeFragment extends AppCompatActivity implements IDataBase {
             public void onClick(DialogInterface arg0, int arg1) {
                 String name = inputName.getText().toString();
                 String value = inputValue.getText().toString();
+                if(value.isEmpty()){
+                    Toast.makeText(HomeFragment.this, "Empty value not allowed!", Toast.LENGTH_SHORT).show();
+                }
                 saveData(name, Double.parseDouble(value));
                 Intent intent = new Intent(getApplicationContext(), HomeFragment.class);
                 startActivity(intent);
+
             }
         });
 
@@ -114,7 +132,8 @@ public class HomeFragment extends AppCompatActivity implements IDataBase {
         alertDialog.show();
     }
 
-    public void deleteAccount(View view) {
+    @Override
+    public void deleteFromDB(View view) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Account Name");
         alertDialogBuilder.setMessage("Enter value:");
@@ -159,7 +178,8 @@ public class HomeFragment extends AppCompatActivity implements IDataBase {
         alertDialog.show();
     }
 
-    public void updateAccount(View view) {
+    @Override
+    public void updateInDB(View view) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Account Name");
         alertDialogBuilder.setMessage("Enter value:");
@@ -184,11 +204,11 @@ public class HomeFragment extends AppCompatActivity implements IDataBase {
         final EditText nameChanged = new EditText(this);
         nameChanged.setHint("Change Account Name");
         layout.addView(nameChanged);
-
+/*
         final EditText valueInput = new EditText(this);
         valueInput.setHint("Change Value");
         layout.addView(valueInput);
-
+*/
         alertDialogBuilder.setView(layout);
 
         alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -197,8 +217,18 @@ public class HomeFragment extends AppCompatActivity implements IDataBase {
                 String accountType = input.getSelectedItem().toString();
                 String newAccountType = nameChanged.getText().toString();
                 System.out.println(newAccountType);
-                String inputValue = valueInput.getText().toString();
-
+                String inputValue = "";
+                for(Account a : accountData) {
+                    inputValue = a.getValue().toString();
+                }
+                /*String inputValue = valueInput.getText().toString();
+                if(inputValue.isEmpty()) {
+                    for(Account a : getAccountData()) {
+                        if(a.getAccountType().equals(accountType)) {
+                            inputValue = a.getValue().toString();
+                        }
+                    }
+                }*/
                 updateData(accountType, newAccountType, Double.parseDouble(inputValue));
                 Intent intent = new Intent(getApplicationContext(), HomeFragment.class);
                 startActivity(intent);
