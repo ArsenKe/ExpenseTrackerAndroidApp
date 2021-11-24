@@ -1,4 +1,4 @@
-package com.example.expensetracker;
+package com.example.expensetracker.database;
 
 import android.database.Cursor;
 import android.view.View;
@@ -11,4 +11,5 @@ public interface IDataBase {
     public void addToDB(View view);
     public void updateInDB(View view);
     public void deleteFromDB(View view);
+
 }

@@ -1,12 +1,14 @@
-package com.example.expensetracker;
+package com.example.expensetracker.activities;
 
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.expensetracker.R;
+import com.example.expensetracker.model.Transaction;
 
 import java.util.ArrayList;
 

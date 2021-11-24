@@ -1,4 +1,4 @@
-package com.example.expensetracker;
+package com.example.expensetracker.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -10,26 +10,37 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.expensetracker.database.DBHelper;
+import com.example.expensetracker.database.IDataBase;
+import com.example.expensetracker.R;
+import com.example.expensetracker.model.Transaction;
+import com.example.expensetracker.database.AccountDBHelper;
+import com.example.expensetracker.database.CategoryDBHelper;
+import com.example.expensetracker.database.TransactionDBHelper;
+import com.example.expensetracker.model.Account;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class accountActivity extends AppCompatActivity implements IDataBase {
+public class AccountActivity extends AppCompatActivity implements IDataBase {
 
 private String accountName;
 private TextView accountOutput;
 private TextView balanceOutput;
-private DBHelper mydb;
+private DBHelper myTransDB;
+private DBHelper myCatDB;
+private DBHelper myAccDB;
 private ArrayList<Account> accountData;
 private ArrayList<Transaction> transactionData;
 private Integer deleteID;
 private Integer updateID;
+private Subject subject;
 
 
     @Override
@@ -40,12 +51,14 @@ private Integer updateID;
         Intent intent = getIntent();
         accountName = intent.getStringExtra("accountName");
 
-        mydb = new DBHelper(accountActivity.this);
-        //readDB();
+        subject = new Subject();
+
+        myTransDB = new TransactionDBHelper(AccountActivity.this, subject);
+        myCatDB = new CategoryDBHelper(AccountActivity.this, subject);
+        myAccDB = new AccountDBHelper(AccountActivity.this, subject);
 
         accountOutput = (TextView) findViewById(R.id.accountNameView);
         balanceOutput = (TextView) findViewById(R.id.totalBudgetTextView);
-        //getAccountData();
         readDB();
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewTransactions);
@@ -57,19 +70,22 @@ private Integer updateID;
 
     }
 
-    public void saveData(String accountName, String transType, String category, Double value) {
-        mydb.addTransaction(accountName, transType, category, value);
-        //getAccountData();
+    private void saveData(String accountName, String transType, String category, Double value) {
+        myTransDB.addTransaction(accountName, transType, category, value);
+        subject.setState(accountName, transType, value);
+        readDB();
     }
 
-    public void updateData(Integer transID, String accountType, String transType, String category, String transValue, Double oldValue) {
-        mydb.updateTransaction(transID, accountType, transType, category, transValue, oldValue);
-        //getAccountData();
+    private void updateData(Integer transID, String accountType, String transType, String category, String transValue, Double oldValue) {
+        myTransDB.updateTransaction(transID, accountType, transType, category, transValue, oldValue);
+        subject.setState(accountName, transType, Double.parseDouble(transValue));
+        readDB();
     }
 
-    public void deleteData(Integer transID, String accountType, String transType, Double transValue) {
-        mydb.deleteTransaction(transID, accountType, transType, transValue);
-        //getAccountData();
+    private void deleteData(Integer transID, String accountType, String transType, Double transValue) {
+        myTransDB.deleteTransaction(transID, accountType, transType, transValue);
+        subject.setState(accountName, transType, transValue);
+        readDB();
     }
 
     @Override
@@ -83,7 +99,7 @@ private Integer updateID;
         layout.setOrientation(LinearLayout.VERTICAL);
 
         List<String> s = new ArrayList<String>();
-        for(String str : mydb.getAllCategories()) {
+        for(String str : myCatDB.getAllCategories()) {
             s.add(str);
         }
         final ArrayAdapter<String> adp = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, s);
@@ -189,7 +205,7 @@ private Integer updateID;
             layout.setOrientation(LinearLayout.VERTICAL);
 
             List<String> s = new ArrayList<String>();
-            for(String str : mydb.getAllCategories()) {
+            for(String str : myCatDB.getAllCategories()) {
                 s.add(str);
             }
             final ArrayAdapter<String> adp = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, s);
@@ -256,8 +272,8 @@ private Integer updateID;
 
     @Override
     public void readDB() {
-        accountData = mydb.getAllAccounts();
-        transactionData = mydb.getTransactions(accountName);
+        accountData = myAccDB.getAllAccounts();
+        transactionData = myTransDB.getTransactions(accountName);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewTransactions);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -266,8 +282,9 @@ private Integer updateID;
         CustomAdapterTransaction customAdapter = new CustomAdapterTransaction(transactionData);
         recyclerView.setAdapter(customAdapter);
 
-        ArrayList<Account> accountData = mydb.getAllAccounts();
-        double balance = 0;
+        ArrayList<Account> accountData = myAccDB.getAllAccounts();
+        double balance = 0.0;
+        double accBalance = 0.0;
         Account account = new Account("test", 0.0);
 
         for(Transaction t : transactionData) {
@@ -287,14 +304,8 @@ private Integer updateID;
         accountOutput.setClickable(false);
     }
 
-    public ArrayList<Account> getAccountData() {
-        ArrayList<Account> accountData = mydb.getAllAccounts();
-
-        return accountData;
-    }
-
     public void backHome(View view) {
-        Intent intent = new Intent(accountActivity.this, HomeFragment.class);
+        Intent intent = new Intent(AccountActivity.this, HomeActivity.class);
         startActivity(intent);
     }
 

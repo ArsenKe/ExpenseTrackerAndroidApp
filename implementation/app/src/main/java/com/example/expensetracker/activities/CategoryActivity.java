@@ -1,4 +1,4 @@
-package com.example.expensetracker;
+package com.example.expensetracker.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -15,12 +15,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.expensetracker.database.IDataBase;
+import com.example.expensetracker.R;
+import com.example.expensetracker.database.CategoryDBHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Category extends AppCompatActivity implements IDataBase {
+public class CategoryActivity extends AppCompatActivity implements IDataBase {
 
-    DBHelper mydb;
+    CategoryDBHelper mydb;
     ArrayList<String> categories = new ArrayList<String>();
 
     @Override
@@ -28,7 +32,7 @@ public class Category extends AppCompatActivity implements IDataBase {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_categories);
 
-        mydb = new DBHelper(Category.this);
+        mydb = new CategoryDBHelper(CategoryActivity.this);
 
         readDB();
 
@@ -36,13 +40,8 @@ public class Category extends AppCompatActivity implements IDataBase {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        CustomAdapter customAdapter = new CustomAdapter(categories);
+        CustomAdapterCategory customAdapter = new CustomAdapterCategory(categories);
         recyclerView.setAdapter(customAdapter);
-    }
-
-    public void backHome(View view) {
-        Intent intent = new Intent(Category.this, HomeFragment.class);
-        startActivity(intent);
     }
 
     @Override
@@ -50,17 +49,17 @@ public class Category extends AppCompatActivity implements IDataBase {
         categories = mydb.getAllCategories();
     }
 
-    public void saveData(String categoryName) {
+    private void saveData(String categoryName) {
         mydb.addCategory(categoryName);
         readDB();
     }
 
-    public void updateData(String categoryName, String newCategoryName) {
+    private void updateData(String categoryName, String newCategoryName) {
         mydb.updateCategory(categoryName, newCategoryName);
         readDB();
     }
 
-    public void deleteData(String categoryName) {
+    private void deleteData(String categoryName) {
         mydb.deleteCategory(categoryName);
         readDB();
     }
@@ -86,7 +85,7 @@ public class Category extends AppCompatActivity implements IDataBase {
             public void onClick(DialogInterface arg0, int arg1) {
                 String name = inputName.getText().toString();
                 saveData(name);
-                Intent intent = new Intent(getApplicationContext(), Category.class);
+                Intent intent = new Intent(getApplicationContext(), CategoryActivity.class);
                 startActivity(intent);
             }
         });
@@ -135,7 +134,7 @@ public class Category extends AppCompatActivity implements IDataBase {
                 String categoryToChange = input.getSelectedItem().toString();
                 String newCategory = nameChanged.getText().toString();
                 updateData(categoryToChange, newCategory);
-                Intent intent = new Intent(getApplicationContext(), Category.class);
+                Intent intent = new Intent(getApplicationContext(), CategoryActivity.class);
                 startActivity(intent);
             }
         });
@@ -179,7 +178,7 @@ public class Category extends AppCompatActivity implements IDataBase {
             public void onClick(DialogInterface arg0, int arg1) {
                 String inputValue = input.getSelectedItem().toString();
                 deleteData(inputValue);
-                Intent intent = new Intent(getApplicationContext(), Category.class);
+                Intent intent = new Intent(getApplicationContext(), CategoryActivity.class);
                 startActivity(intent);
             }
         });
@@ -194,5 +193,11 @@ public class Category extends AppCompatActivity implements IDataBase {
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
+
+    public void backHome(View view) {
+        Intent intent = new Intent(CategoryActivity.this, HomeActivity.class);
+        startActivity(intent);
+    }
+
 
 }

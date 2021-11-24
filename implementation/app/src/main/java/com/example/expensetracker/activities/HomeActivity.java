@@ -1,4 +1,4 @@
-package com.example.expensetracker;
+package com.example.expensetracker.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -14,55 +14,61 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.lang.reflect.Type;
+import com.example.expensetracker.database.IDataBase;
+import com.example.expensetracker.R;
+import com.example.expensetracker.database.AccountDBHelper;
+import com.example.expensetracker.model.Account;
+import com.example.expensetracker.model.AccountFactory;
+import com.example.expensetracker.model.IAccount;
+
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class HomeFragment extends AppCompatActivity implements IDataBase {
+public class HomeActivity extends AppCompatActivity implements IDataBase {
 
-    private DBHelper mydb;
+    private AccountDBHelper mydb;
+    private ArrayList<Account> allAccounts;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mydb = new DBHelper(HomeFragment.this);
-        getAccountData();
+        mydb = new AccountDBHelper(HomeActivity.this);
+        readDB();
 
-        setContentView(R.layout.activity_home_fragment);
+        setContentView(R.layout.activity_home);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(linearLayoutManager);
 
         ArrayList<String> accountTypes = new ArrayList<String>();
-        for(Account a : getAccountData()) {
+        for(Account a : allAccounts) {
             accountTypes.add(a.getAccountType());
         }
 
-        CustomAdapter customAdapter = new CustomAdapter(accountTypes);
-        recyclerView.setAdapter(customAdapter);
+        CustomAdapterAccount customAdapterAccount = new CustomAdapterAccount(accountTypes);
+        recyclerView.setAdapter(customAdapterAccount);
 
     }
 
-    public void saveData(String accountType, double value) {
+    private void saveData(String accountType, double value) {
         mydb.addAccount(accountType, value);
-        getAccountData();
+        readDB();
     }
 
-    public void updateData(String accountType, String newAccountType, double value) {
+    private void updateData(String accountType, String newAccountType, double value) {
         mydb.updateAccount(accountType, newAccountType, value);
-        getAccountData();
+        readDB();
     }
 
-    public void deleteData(String accountType) {
+    private void deleteData(String accountType) {
         mydb.deleteAccount(accountType);
-        getAccountData();
+        readDB();
     }
 
     @Override
@@ -75,49 +81,31 @@ public class HomeFragment extends AppCompatActivity implements IDataBase {
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
 
-        List<String> s = new ArrayList<String>();
+        List<String> accountTypes = new ArrayList<String>();
+        accountTypes.add("BANK");
+        accountTypes.add("CASH");
+        accountTypes.add("CARD");
+        final ArrayAdapter<String> adp = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, accountTypes);
 
-        ArrayList<Account> accountData = getAccountData();
-        for(Account a : accountData) {
-            s.add(a.getAccountType());
-        }
-
-        final ArrayAdapter<String> adp = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, s);
-
-        final EditText inputName = new EditText(this);
-        inputName.setHint("Account Name");
-        layout.addView(inputName);
-
-        final EditText inputValue = new EditText(this);
-        inputValue.setHint("Value");
-        layout.addView(inputValue);
-
-        if(inputValue.getText().toString().isEmpty()) {
-            alertDialogBuilder.setTitle("No Value Entered!");
-            alertDialogBuilder.setMessage("Please Enter Value");
-            alertDialogBuilder.setCancelable(false);
-
-            alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface arg0, int arg1) {
-                }
-            });
-        }
-
+        final Spinner accounts = new Spinner(this);
+        accounts.setAdapter(adp);
+        layout.addView(accounts);
         alertDialogBuilder.setView(layout);
 
         alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
-                String name = inputName.getText().toString();
-                String value = inputValue.getText().toString();
-                if(value.isEmpty()){
-                    Toast.makeText(HomeFragment.this, "Empty value not allowed!", Toast.LENGTH_SHORT).show();
-                }
-                saveData(name, Double.parseDouble(value));
-                Intent intent = new Intent(getApplicationContext(), HomeFragment.class);
-                startActivity(intent);
+                String name = accounts.getSelectedItem().toString();
+                String value = "0";
 
+                //implementing Factory Pattern
+                AccountFactory accountFactory = new AccountFactory();
+                IAccount acc = accountFactory.getAccount(name);
+                Account accountToSave = acc.create();
+
+                saveData(accountToSave.getAccountType(), Double.parseDouble(value));
+                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -144,8 +132,7 @@ public class HomeFragment extends AppCompatActivity implements IDataBase {
 
         List<String> s = new ArrayList<String>();
 
-        ArrayList<Account> accountData = getAccountData();
-        for(Account a : accountData) {
+        for(Account a : allAccounts) {
             s.add(a.getAccountType());
         }
 
@@ -162,7 +149,7 @@ public class HomeFragment extends AppCompatActivity implements IDataBase {
             public void onClick(DialogInterface arg0, int arg1) {
                 String inputValue = input.getSelectedItem().toString();
                 deleteData(inputValue);
-                Intent intent = new Intent(getApplicationContext(), HomeFragment.class);
+                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
                 startActivity(intent);
             }
         });
@@ -190,8 +177,7 @@ public class HomeFragment extends AppCompatActivity implements IDataBase {
 
         List<String> s = new ArrayList<String>();
 
-        ArrayList<Account> accountData = getAccountData();
-        for(Account a : accountData) {
+        for(Account a : allAccounts) {
             s.add(a.getAccountType());
         }
 
@@ -204,11 +190,7 @@ public class HomeFragment extends AppCompatActivity implements IDataBase {
         final EditText nameChanged = new EditText(this);
         nameChanged.setHint("Change Account Name");
         layout.addView(nameChanged);
-/*
-        final EditText valueInput = new EditText(this);
-        valueInput.setHint("Change Value");
-        layout.addView(valueInput);
-*/
+
         alertDialogBuilder.setView(layout);
 
         alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -218,19 +200,11 @@ public class HomeFragment extends AppCompatActivity implements IDataBase {
                 String newAccountType = nameChanged.getText().toString();
                 System.out.println(newAccountType);
                 String inputValue = "";
-                for(Account a : accountData) {
+                for(Account a : allAccounts) {
                     inputValue = a.getValue().toString();
                 }
-                /*String inputValue = valueInput.getText().toString();
-                if(inputValue.isEmpty()) {
-                    for(Account a : getAccountData()) {
-                        if(a.getAccountType().equals(accountType)) {
-                            inputValue = a.getValue().toString();
-                        }
-                    }
-                }*/
                 updateData(accountType, newAccountType, Double.parseDouble(inputValue));
-                Intent intent = new Intent(getApplicationContext(), HomeFragment.class);
+                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
                 startActivity(intent);
             }
         });
@@ -248,18 +222,7 @@ public class HomeFragment extends AppCompatActivity implements IDataBase {
 
     @Override
     public void readDB() {
-
-    }
-
-    public ArrayList<Account> getAccountData() {
-        ArrayList<Account> accountData = mydb.getAllAccounts();
-        double balance = 0;
-
-        for(Account a : accountData) {
-            balance += a.getValue();
-        }
-
-        return accountData;
+        allAccounts = mydb.getAllAccounts();
     }
 
     public void showAccount(View view) {
@@ -267,13 +230,13 @@ public class HomeFragment extends AppCompatActivity implements IDataBase {
 
         textView = (TextView) view.findViewById(R.id.textView);
 
-        Intent intent = new Intent(HomeFragment.this, accountActivity.class);
+        Intent intent = new Intent(HomeActivity.this, AccountActivity.class);
         intent.putExtra("accountName", textView.getText().toString());
         startActivity(intent);
     }
 
     public void editCategories(View view) {
-        Intent intent = new Intent(HomeFragment.this, Category.class);
+        Intent intent = new Intent(HomeActivity.this, CategoryActivity.class);
         startActivity(intent);
     }
 }

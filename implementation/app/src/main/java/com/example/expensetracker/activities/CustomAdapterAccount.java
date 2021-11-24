@@ -1,6 +1,5 @@
-package com.example.expensetracker;
+package com.example.expensetracker.activities;
 
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,9 +7,11 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.expensetracker.R;
+
 import java.util.ArrayList;
 
-public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
+public class CustomAdapterAccount extends RecyclerView.Adapter<CustomAdapterAccount.ViewHolder> {
 
     private ArrayList<String> localDataSet;
 
@@ -28,7 +29,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         }
     }
 
-    public CustomAdapter(ArrayList<String> dataSet) {
+    public CustomAdapterAccount(ArrayList<String> dataSet) {
         localDataSet = dataSet;
     }
 
@@ -36,7 +37,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 
         View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.rowlayout, viewGroup, false);
+                .inflate(R.layout.rowlayout_activity, viewGroup, false);
 
         return new ViewHolder(view);
     }
