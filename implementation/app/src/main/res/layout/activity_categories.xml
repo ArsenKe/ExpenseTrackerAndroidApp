@@ -5,56 +5,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activities.AccountActivity">
-
-    <TextView
-        android:id="@+id/accountNameView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:textAlignment="center"
-        android:textColor="#000"
-        android:textSize="25sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/totalBudgetTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:textStyle="bold"
-        android:textAlignment="center"
-        android:textColor="#000"
-        android:layout_marginTop="5dp"
-        />
-
-    <TextView
-        android:id="@+id/amount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
+    tools:context=".activities.CategoryActivity">
 
     <Button
-        android:id="@+id/addAccountButton"
+        android:id="@+id/addCategoryButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="ADD TRANSACTION"
+        android:text="ADD CATEGORY"
         android:onClick="addToDB"
         />
 
     <Button
-        android:id="@+id/changeAccountButton"
+        android:id="@+id/changeCategoriesButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="CHANGE TRANSACTION"
+        android:text="CHANGE CATEGORIES"
         android:onClick="updateInDB"
         />
 
     <Button
-        android:id="@+id/deleteAccountButton"
+        android:id="@+id/deleteCategoryButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="DELETE TRANSACTION"
+        android:text="DELETE CATEGORY"
         android:onClick="deleteFromDB"
         />
 
@@ -66,8 +39,8 @@
         android:text="HOME" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewTransactions"
-        android:layout_width="match_parent"
+        android:id="@+id/recyclerViewCategories"
+        android:layout_width="206dp"
         android:layout_height="258dp"
         android:layout_marginBottom="276dp"
         app:layout_constraintBottom_toBottomOf="parent"
