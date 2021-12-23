@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
+
+import android.util.Log;
 import android.view.View;
 import android.content.Intent;
 import android.widget.ArrayAdapter;
@@ -17,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.expensetracker.Exception_handling;
 import com.example.expensetracker.database.IDataBase;
 import com.example.expensetracker.R;
 import com.example.expensetracker.database.AccountDBHelper;
@@ -32,13 +35,21 @@ public class HomeActivity extends AppCompatActivity implements IDataBase {
 
     private AccountDBHelper mydb;
     private ArrayList<Account> allAccounts;
+    private Exception_handling myhandler;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mydb = new AccountDBHelper(HomeActivity.this);
-        readDB();
+        try {
+            mydb = new AccountDBHelper(HomeActivity.this);
+            readDB();
+        } catch (Exception e) {
+            Log.d("HomeActivity_db", e.toString());
+            myhandler.setContext(getApplicationContext());
+            myhandler.setException(e.toString());
+        }
 
         setContentView(R.layout.activity_home);
 
@@ -57,18 +68,36 @@ public class HomeActivity extends AppCompatActivity implements IDataBase {
     }
 
     private void saveData(String accountType, double value) {
-        mydb.addAccount(accountType, value);
-        readDB();
+        try {
+            mydb.addAccount(accountType, value);
+            readDB();
+        } catch (Exception e) {
+            Log.d("HomeActivity_db", e.toString());
+            myhandler.setContext(getApplicationContext());
+            myhandler.setException(e.toString());
+        }
     }
 
     private void updateData(String accountType, String newAccountType, double value) {
-        mydb.updateAccount(accountType, newAccountType, value);
-        readDB();
+       try{
+           mydb.updateAccount(accountType, newAccountType, value);
+           readDB();
+       } catch (Exception e) {
+           Log.d("HomeActivity_db", e.toString());
+           myhandler.setContext(getApplicationContext());
+           myhandler.setException(e.toString());
+       }
     }
 
     private void deleteData(String accountType) {
-        mydb.deleteAccount(accountType);
-        readDB();
+        try {
+            mydb.deleteAccount(accountType);
+            readDB();
+        } catch (Exception e) {
+            Log.d("HomeActivity_db", e.toString());
+            myhandler.setContext(getApplicationContext());
+            myhandler.setException(e.toString());
+        }
     }
 
     @Override
@@ -222,7 +251,13 @@ public class HomeActivity extends AppCompatActivity implements IDataBase {
 
     @Override
     public void readDB() {
-        allAccounts = mydb.getAllAccounts();
+        try {
+            allAccounts = mydb.getAllAccounts();
+        } catch (Exception e) {
+            Log.d("HomeActivity_db", e.toString());
+            myhandler.setContext(getApplicationContext());
+            myhandler.setException(e.toString());
+        }
     }
 
     public void showAccount(View view) {

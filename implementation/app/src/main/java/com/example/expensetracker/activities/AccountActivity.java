@@ -5,9 +5,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -16,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.expensetracker.Exception_handling;
 import com.example.expensetracker.database.DBHelper;
 import com.example.expensetracker.database.IDataBase;
 import com.example.expensetracker.R;
@@ -41,52 +44,104 @@ private ArrayList<Transaction> transactionData;
 private Integer deleteID;
 private Integer updateID;
 private Subject subject;
+private Exception_handling myhandler;
 
-
+    //use try and catch clause in the code when we are contacting to db
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account);
 
+        // ??????????
+       // Context context = null;
+   /* public AccountActivity(Context context) {
+          super(context, "accounts.sqlite", null, 3);
+          this.context = context;}
+
+    */
+
+    
+        Exception_handling myhandler = new Exception_handling();
+        //it gets the account name from previous screeen
         Intent intent = getIntent();
         accountName = intent.getStringExtra("accountName");
 
+        //stores runtime info
         subject = new Subject();
-
+        try{
         myTransDB = new TransactionDBHelper(AccountActivity.this, subject);
         myCatDB = new CategoryDBHelper(AccountActivity.this, subject);
         myAccDB = new AccountDBHelper(AccountActivity.this, subject);
 
+        //binding xml
         accountOutput = (TextView) findViewById(R.id.accountNameView);
         balanceOutput = (TextView) findViewById(R.id.totalBudgetTextView);
-        readDB();
 
+
+        readDB();
+        }
+        catch (Exception e)
+        {
+            //if the first one will on storage error
+            //the second one will be connection error
+            myhandler.setContext(getApplicationContext());
+            myhandler.setException(e.toString());
+        }
+
+            // recycle view resad the data from DB and shows it in recyclerview in linear layout
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewTransactions);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(linearLayoutManager);
 
+        //connect the data with dataview, data (list) which can be used in recycleview
         CustomAdapterTransaction customAdapter = new CustomAdapterTransaction(transactionData);
         recyclerView.setAdapter(customAdapter);
 
     }
 
     private void saveData(String accountName, String transType, String category, Double value) {
+
+        try{
         myTransDB.addTransaction(accountName, transType, category, value);
         subject.setState(accountName, transType, value);
         readDB();
+        }
+        catch (Exception e)
+        {       Log.d("AccountActivity_db", "Save Data error");
+                myhandler.setContext(getApplicationContext());
+                myhandler.setException(e.toString());
+        }
+
     }
 
     private void updateData(Integer transID, String accountType, String transType, String category, String transValue, Double oldValue) {
-        myTransDB.updateTransaction(transID, accountType, transType, category, transValue, oldValue);
-        subject.setState(accountName, transType, Double.parseDouble(transValue));
-        readDB();
+
+        try {
+            myTransDB.updateTransaction(transID, accountType, transType, category, transValue, oldValue);
+            subject.setState(accountName, transType, Double.parseDouble(transValue));
+            readDB();
+        } catch (Exception e) {
+            Log.d("AccountActivity_db", "Update Data error");
+            myhandler.setContext(getApplicationContext());
+            myhandler.setException(e.toString());
+
+        }
     }
 
     private void deleteData(Integer transID, String accountType, String transType, Double transValue) {
-        myTransDB.deleteTransaction(transID, accountType, transType, transValue);
-        subject.setState(accountName, transType, transValue);
-        readDB();
-    }
+           try {
+               myTransDB.deleteTransaction(transID, accountType, transType, transValue);
+               subject.setState(accountName, transType, transValue);
+               readDB();
+           } catch (Exception e)
+           {
+               Log.d("AccountActivity_db", "Delete Data error");
+               myhandler.setContext(getApplicationContext());
+               myhandler.setException(e.toString());
+           }
+
+
+        }
 
     @Override
     public void addToDB(View view) {
@@ -130,7 +185,14 @@ private Subject subject;
                 String category = categories.getSelectedItem().toString();
                 String value = inputValue.getText().toString();
                 saveData(accountName, transType, category, Double.parseDouble(value));
-                readDB();
+               try {
+                   readDB();
+               } catch (Exception e) {
+                 // ???????????? e.printStackTrace();
+                   Log.d("AccountActivity_db", "Add to DB error");
+                   myhandler.setContext(getApplicationContext());
+                   myhandler.setException(e.toString());
+               }
             }
         });
 
@@ -166,7 +228,14 @@ private Subject subject;
                         }
                     }
                     deleteData(deleteID, accountName, transType, transValue);
-                    readDB();
+                   try {
+                       readDB();
+                   } catch (Exception e) {
+                       //  e.printStackTrace();
+                       Log.d("AccountActivity_db", "deleteFromDB error");
+                       myhandler.setContext(getApplicationContext());
+                       myhandler.setException(e.toString());
+                   }
                 }
             });
 
@@ -243,8 +312,15 @@ private Subject subject;
                         }
                     }
 
-                    updateData(updateID, accountName, transType, category, value, oldValue);
-                    readDB();
+                    try {
+                        updateData(updateID, accountName, transType, category, value, oldValue);
+                        readDB();
+                    } catch (Exception e) {
+                       // e.printStackTrace();
+                        Log.d("AccountActivity_db", "updateInDB error");
+                        myhandler.setContext(getApplicationContext());
+                        myhandler.setException(e.toString());
+                    }
                 }
             });
 

@@ -30,7 +30,16 @@ public class MainActivity extends AppCompatActivity {
         loginbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (username.getText().toString().equals("admin") && password.getText().toString().equals("admin")) {
+                if (!username.getText().toString().isEmpty() && ! password.getText().toString().isEmpty()) {
+                    RegistrationUtil   validation = new RegistrationUtil(username.getText().toString(),password.getText().toString() );
+
+                }
+                else
+                {
+                    Toast.makeText(MainActivity.this, "Please enter information !!!", Toast.LENGTH_SHORT).show();
+                }
+                RegistrationUtil   validation = new RegistrationUtil(username.getText().toString(),password.getText().toString() );
+                if (validation.validation()) {
                     openUserActivity();
                 } else
                     Toast.makeText(MainActivity.this, "LOGIN FAILED !!!", Toast.LENGTH_SHORT).show();

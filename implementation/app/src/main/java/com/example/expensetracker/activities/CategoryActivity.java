@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -15,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.expensetracker.Exception_handling;
 import com.example.expensetracker.database.IDataBase;
 import com.example.expensetracker.R;
 import com.example.expensetracker.database.CategoryDBHelper;
@@ -25,7 +27,8 @@ import java.util.List;
 public class CategoryActivity extends AppCompatActivity implements IDataBase {
 
     CategoryDBHelper mydb;
-    ArrayList<String> categories = new ArrayList<String>();
+    ArrayList<String> saveDataInCategory = new ArrayList<String>();
+    private Exception_handling myhandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +36,14 @@ public class CategoryActivity extends AppCompatActivity implements IDataBase {
         setContentView(R.layout.activity_categories);
 
         mydb = new CategoryDBHelper(CategoryActivity.this);
-
+        try {
         readDB();
+        } catch (Exception e) {
+            Log.d("CategoryActivity_db", e.toString());
+            myhandler.setContext(getApplicationContext());
+            myhandler.setException(e.toString());
+        }
+
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewCategories);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -46,22 +55,45 @@ public class CategoryActivity extends AppCompatActivity implements IDataBase {
 
     @Override
     public void readDB() {
-        categories = mydb.getAllCategories();
+        try{saveDataInCategory = mydb.getAllCategories();} catch (Exception e) {
+            Log.d("CategoryActivity_db", e.toString());
+            myhandler.setContext(getApplicationContext());
+            myhandler.setException(e.toString());
+        }
+
     }
 
     private void saveData(String categoryName) {
-        mydb.addCategory(categoryName);
-        readDB();
+       try {mydb.addCategory(categoryName);
+           readDB();
+       } catch (Exception e) {
+           Log.d("CategoryActivity_db", e.toString());
+           myhandler.setContext(getApplicationContext());
+           myhandler.setException(e.toString());
+       }
+
     }
 
     private void updateData(String categoryName, String newCategoryName) {
-        mydb.updateCategory(categoryName, newCategoryName);
-        readDB();
+        try {
+            mydb.updateCategory(categoryName, newCategoryName);
+            readDB();
+        } catch (Exception e) {
+            Log.d("CategoryActivity_db", e.toString());
+            myhandler.setContext(getApplicationContext());
+            myhandler.setException(e.toString());
+        }
     }
 
     private void deleteData(String categoryName) {
-        mydb.deleteCategory(categoryName);
-        readDB();
+        try {
+            mydb.deleteCategory(categoryName);
+            readDB();
+        } catch (Exception e) {
+            Log.d("CategoryActivity_db", e.toString());
+            myhandler.setContext(getApplicationContext());
+            myhandler.setException(e.toString());
+        }
     }
 
     @Override
